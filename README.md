@@ -55,3 +55,5 @@ This project features a high-end, modern user interface utilizing **Glassmorphis
    ```bash
    git clone [https://github.com/yourusername/tech-system.git](https://github.com/yourusername/tech-system.git)
    cd tech-system
+
+The application will be running at http://localhost:8000/home
