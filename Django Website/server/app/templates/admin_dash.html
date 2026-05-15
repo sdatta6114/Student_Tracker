@@ -1,0 +1,227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+    <style>
+        /* Preserving your existing table and layout styles */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        select, input[type="text"], input[type="number"], input[type="time"], input[type="url"] {
+            padding: 8px; border-radius: 4px; background: rgba(15, 23, 42, 0.5); color: white; border: 1px solid var(--border);
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.5">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+                <li><a href="/batch-manager">Batch Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+        <h1>Institute Control Center</h1>
+        
+        <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+            <div style="background: rgba(11, 43, 130, 0.4); padding: 20px; border-radius: 8px; flex: 1; border-left: 5px solid #10b981; border-top: 1px solid var(--border); border-right: 1px solid var(--border);">
+                <h3>Total Revenue</h3>
+                <h2 style="color: #10b981;">₹{{ revenue }}</h2>
+            </div>
+            <div style="background: rgba(11, 43, 130, 0.4); padding: 20px; border-radius: 8px; flex: 1; border-left: 5px solid #ef4444; border-top: 1px solid var(--border); border-right: 1px solid var(--border);">
+                <h3>Total Dues</h3>
+                <h2 style="color: #ef4444;">₹{{ dues }}</h2>
+            </div>
+        </div>
+
+        <!-- <hr style="border: 0; border-top: 1px solid var(--border); margin: 40px 0;">
+
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 40px;">
+            <h3 style="margin-top: 0;">Set Up New Batch</h3>
+            <form action="/admin-dash" method="GET" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <input type="hidden" name="create_batch" value="true">
+                <div><label style="font-size: 0.8rem; color: #cbd5e1;">SELECT COURSE</label>
+                    <select name="course_id" required>{% for c in all_courses %}<option value="{{ c.id }}">{{ c.title }}</option>{% endfor %}</select>
+                </div>
+                <div><label style="font-size: 0.8rem; color: #cbd5e1;">ASSIGN TEACHER</label>
+                    <select name="teacher_id" required>{% for t in active_teachers %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>
+                </div>
+                <div><label style="font-size: 0.8rem; color: #cbd5e1;">BATCH NUMBER/ID</label><input type="text" name="batch_num" required></div>
+                <div><label style="font-size: 0.8rem; color: #cbd5e1;">SCHEDULE DAYS</label><input type="text" name="days" required></div>
+                <div><label style="font-size: 0.8rem; color: #cbd5e1;">CLASS TIME</label><input type="time" name="time" required></div>
+                <div style="grid-column: span 3;">
+                    <label style="font-size: 0.8rem; color: #cbd5e1;">CLASS MEETING LINK</label>
+                    <input type="url" name="class_link" style="margin-bottom: 10px;">
+                    <button type="submit" style="width: 100%;">CREATE BATCH</button>
+                </div>
+            </form>
+        </div> -->
+
+        <h2>Pending Teacher Approvals</h2>
+        <table>
+            <thead><tr><th>Teacher Name</th><th>Email</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for t in pending_teachers %}
+                <tr><td>{{ t.name }}</td><td>{{ t.email }}</td>
+                    <td><a href="/admin-dash?approve_teacher=true&tid={{ t.id }}" class="btn" style="padding: 5px 10px; font-size: 0.8rem;">Approve Teacher</a></td>
+                </tr>
+                {% empty %}<tr><td colspan="3">No teachers awaiting approval.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+
+        <h2 style="margin-top: 40px;">Pending Course Applications</h2>
+        <table>
+            <thead><tr><th>Student</th><th>Course</th><th>Assign Batch</th><th>Final Fee</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for e in enrollments %}{% if not e.is_approved %}
+                <tr><td>{{ e.student.name }}</td><td>{{ e.course.title }}</td>
+                    <form action="/admin-dash" method="GET">
+                        <input type="hidden" name="approve_enrollment" value="true"><input type="hidden" name="eid" value="{{ e.id }}">
+                        <td><select name="batch_id" required><option value="">Select Batch</option>{% for b in batches %}<option value="{{ b.id }}">{{ b.batch_number }}</option>{% endfor %}</select></td>
+                        <td><input type="number" name="final_fee" value="{{ e.total_fee }}" style="width: 100px;"></td>
+                        <td><button type="submit" style="padding: 5px 15px; font-size: 0.8rem;">Approve</button></td>
+                    </form>
+                </tr>{% endif %}{% endfor %}
+            </tbody>
+        </table>
+
+        <h2 style="margin-top: 50px;">Enrollment & Payments</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Total Fee</th>
+            <th>Receipt</th>
+            <th>Status</th>
+            <th>Paid</th>
+            <th>Update Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in enrollments %}
+            {% if e.is_approved %}
+            <tr>
+                <form action="/admin-dash" method="GET">
+                    <input type="hidden" name="update_payment" value="true">
+                    <input type="hidden" name="eid" value="{{ e.id }}">
+                    
+                    <td>{{ e.student.name }}</td>
+                    <td>{{ e.course.title }}</td>
+                    <td>₹{{ e.total_fee }}</td>
+                    
+                    <td>
+                        {% if e.receipt %}
+                            <a href="{{ e.receipt.url }}" target="_blank" style="color: var(--accent); font-weight: bold;">Proof</a>
+                        {% endif %}
+                        {% for rec in e.officialreceipt_set.all %}
+                            <div style="margin-top: 5px;">
+                                <a href="/download-receipt/{{ rec.id }}" style="color: #10b981; font-size: 0.7rem;">📄 {{ rec.receipt_number }}</a>
+                            </div>
+                        {% endfor %}
+                        <div style="margin-top: 5px;">
+                            <a href="/generate-receipt/?eid={{ e.id }}" class="btn" style="font-size: 0.65rem; padding: 5px; display: inline-block; text-decoration: none;">Generate & Send</a>
+                        </div>
+                    </td>
+
+                    <td>
+                        <select name="status" style="font-size: 0.8rem; padding: 4px; border-radius: 4px; background: #0f172a; color: white; border: 1px solid #334155;">
+                            <option value="Ongoing" {% if e.status == "Ongoing" %}selected{% endif %}>Ongoing</option>
+                            <option value="Completed" {% if e.status == "Completed" %}selected{% endif %}>Completed</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <input type="number" name="amt" 
+                            value="{% if e.total_fee > 0 %}{{ e.amount_paid }}{% endif %}" 
+                            placeholder="{% if e.total_fee == 0 %}Free{% endif %}"
+                            {% if e.total_fee == 0 %}readonly{% endif %}
+                            style="{% if e.total_fee == 0 %}width: 50px; background: rgba(255,255,255,0.05); cursor: not_allowed;{% else %}width: 80px; background: #0f172a;{% endif %} padding: 5px; border-radius: 4px; border: 1px solid #334155; color: white; text-align: center;">
+                    </td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <button type="submit" style="font-size: 0.65rem; padding: 5px; background: #06b6d4; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                                SAVE
+                            </button>
+
+                            {% if e.total_fee > 0 and e.amount_paid < e.total_fee %}
+                                <a href="/admin-dash?toggle_halt=true&eid={{ e.id }}" 
+                                   style="background: {% if e.is_halted %}#10b981{% else %}#ef4444{% endif %}; color: white; padding: 5px; border-radius: 4px; text-decoration: none; font-size: 0.65rem; text-align: center; font-weight: bold;">
+                                    {% if e.is_halted %}Resume{% else %}Halt{% endif %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </form>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 50px 0;">
+
+<!-- <h2 style="color: #fbbf24;">Ongoing Batches Management</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+    {% for b in batches %}
+    <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <h3 style="margin-top: 0; color: #3b82f6;">{{ b.course.title }}</h3>
+            <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Batch ID:</strong> {{ b.batch_number }}</p>
+            <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Teacher:</strong> {{ b.teacher.name }}</p>
+            <p style="margin: 5px 0; font-size: 0.8rem; color: #94a3b8;">{{ b.schedule_days }} | {{ b.schedule_time|time:"H:i" }}</p>
+        </div>
+        
+        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <a href="/admin-dash?finish_batch=true&bid={{ b.id }}" 
+               onclick="return confirm('Are you sure? This will move the batch to the Teacher Feedback tab and mark all student statuses as Completed.')"
+               style="display: block; text-align: center; background: #ef4444; color: white; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85rem;">
+               🚩 Finish & Close Batch
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <p style="color: #94a3b8;">No ongoing batches to display.</p>
+    {% endfor %}
+</div> -->
+    </div>
+</body>
+</html>

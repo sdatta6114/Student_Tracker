@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Batch Manager - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+    <style>
+        /* Preserving existing table and input formats while updating colors to match theme */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        code { background: rgba(0, 0, 0, 0.3); padding: 2px 6px; border-radius: 4px; color: var(--fluro-blue); }
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+                <li><a href="/batch-manager">Batch Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+   <div class="container" style="max-width: 1200px; margin: 40px auto; padding: 20px;">
+        <h1>Batch Management Center</h1>
+
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 40px;">
+            <h3 style="margin-top: 0; color: #3b82f6;">Set Up New Batch</h3>
+            <form action="/batch-manager" method="POST" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                {% csrf_token %}
+                <input type="hidden" name="create_batch" value="true">
+                
+                <div>
+                    <label>Select Course</label>
+                    <select name="course_id" required>
+                        {% for c in courses %}<option value="{{ c.id }}">{{ c.title }}</option>{% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label>Assign Teacher</label>
+                    <select name="teacher_id" required>
+                        {% for t in teachers %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label>Batch Number/ID</label>
+                    <input type="text" name="batch_num" required>
+                </div>
+                
+                <div>
+                    <label>Schedule Days</label>
+                    <input type="text" name="days" placeholder="e.g. Mon, Wed, Fri" required>
+                </div>
+                
+                <div>
+                    <label>Class Time</label>
+                    <input type="time" name="time" required>
+                </div>
+
+                <div>
+                    <label>Class Meeting Link</label>
+                    <input type="url" name="class_link">
+                </div>
+                
+                <button type="submit" class="btn-launch">🚀 LAUNCH BATCH</button>
+            </form>
+        </div>
+      
+{% if completion_requests %}
+<h2 style="color: #f87171; border-bottom: 2px solid #ef4444; padding-bottom: 10px;">🔔 Teacher Completion Requests</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin: 20px 0 40px 0;">
+    {% for b in completion_requests %}
+    <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <h3 style="margin-top: 0; color: #fca5a5;">{{ b.course.title }}</h3>
+            <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Batch ID:</strong> {{ b.batch_number }}</p>
+            <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Teacher:</strong> {{ b.teacher.name }}</p>
+            <p style="margin: 10px 0; color: white; font-size: 0.85rem; font-style: italic; background: rgba(239, 68, 68, 0.2); padding: 5px; border-radius: 4px;">
+                📢 Teacher has marked this tenure as complete.
+            </p>
+        </div>
+        
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <a href="/batch-manager?finish_batch=true&bid={{ b.id }}" 
+               onclick="return confirm('Finalize Batch? This will block student class access and unlock certificates.')"
+               style="display: block; text-align: center; background: #10b981; color: white; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85rem;">
+               ✅ Confirm Completion & Archive
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+        <h2 style="color: #fbbf24;">Ongoing Batches Management</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+            {% for b in active_batches %}
+            <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h3 style="margin-top: 0; color: #3b82f6;">{{ b.course.title }}</h3>
+                    <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Batch ID:</strong> {{ b.batch_number }}</p>
+                    <p style="margin: 5px 0; font-size: 0.9rem;"><strong>Teacher:</strong> {{ b.teacher.name }}</p>
+                    <p style="margin: 5px 0; font-size: 0.8rem; color: #94a3b8;">{{ b.schedule_days }} | {{ b.schedule_time|time:"H:i" }}</p>
+                </div>
+                
+                <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <a href="/batch-manager?finish_batch=true&bid={{ b.id }}" 
+                       onclick="return confirm('Are you sure? This will move the batch to the Teacher Feedback tab and mark all student statuses as Completed.')"
+                       style="display: block; text-align: center; background: #ef4444; color: white; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85rem;">
+                       🚩 Finish & Close Batch
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color: #94a3b8;">No ongoing batches to display.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

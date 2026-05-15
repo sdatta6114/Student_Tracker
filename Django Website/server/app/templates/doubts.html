@@ -1,0 +1,171 @@
+{% load custom_filters %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        /* Glassmorphism Container to match Teacher Workspace */
+        .doubt-card-container {
+            background: rgba(11, 43, 130, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Form Input Styling */
+        .doubt-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid #334155 !important;
+            color: white !important;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .doubt-input:focus {
+            outline: none;
+            border-color: #38bdf8 !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+        }
+
+        /* Gradient Button to match Resource Upload */
+        .doubt-submit-btn {
+            background: linear-gradient(90deg, #06b6d4, #3b82f6) !important;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .doubt-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .reply-container {
+            border-left: 3px solid #06b6d4;
+            padding: 10px 15px;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body style="background-color: #020617;"> 
+<div id="doubts-container" style="color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1100px; margin: auto; padding: 20px;">
+    
+    <section class="doubt-card-container" style="margin-bottom: 40px;">
+        <h2 style="margin-top: 0; color: #38bdf8; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; font-weight: 700;">🚀 Ask a Technical Doubt</h2>
+        
+        <form method="POST" action="/doubts" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1;">📌 Doubt Title</label>
+                <input type="text" name="title" class="doubt-input" placeholder="e.g., Error in Django ForeignKey setup" required>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1;">🎓 Select Your Course</label>
+                <select name="enrollment_id" required class="doubt-input">
+                    <option value="" disabled selected>-- Choose from your enrolled courses --</option>
+                    {% for en in my_enrollments %}
+                        <option value="{{ en.id }}">{{ en.course.title }} (Batch: {{ en.batch.batch_number }})</option>
+                    {% endfor %}
+                </select>
+                <small style="color: #64748b; font-size: 0.75rem;">Batch ID will be linked automatically based on your selection.</small>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1;">📝 Description</label>
+                <textarea name="description" class="doubt-input" rows="4" placeholder="Describe your technical problem in detail..." required></textarea>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1;">📸 Upload Screenshot (Code/Error)</label>
+                <input type="file" name="screenshot" accept="image/*" style="font-size: 0.8rem; color: #94a3b8;">
+            </div>
+
+            <button type="submit" name="ask_doubt" class="doubt-submit-btn">
+                Submit Doubt
+            </button>
+        </form>
+    </section>
+
+    <section>
+        <h3 style="color: #fbbf24; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;">📂</span> My Doubts History
+        </h3>
+        
+        {% for doubt in doubts %}
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #1e293b; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 20px;">
+                <div>
+                    <h4 style="margin: 0; color: #38bdf8; font-size: 1.1rem;">{{ doubt.title }}</h4>
+                    <small style="color: #64748b;">Course: {{ doubt.enrollment.course.title }}</small>
+                </div>
+                <span class="status-badge" style="background: {% if doubt.is_resolved %}#064e3b{% else %}#450a0a{% endif %}; color: {% if doubt.is_resolved %}#34d399{% else %}#f87171{% endif %};">
+                    {% if doubt.is_resolved %}✅ RESOLVED{% else %}⏳ PENDING{% endif %}
+                </span>
+            </div>
+
+            <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px;">{{ doubt.description }}</p>
+
+            {% if doubt.screenshot %}
+            <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; display: inline-block;">
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">Attached technical screenshot:</p>
+                <a href="{{ doubt.screenshot.url }}" target="_blank">
+                    <img src="{{ doubt.screenshot.url }}" style="max-width: 100%; max-height: 300px; border-radius: 6px; border: 1px solid #334155; cursor: zoom-in;">
+                </a>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 30px; background: rgba(2, 6, 23, 0.4); border-radius: 10px; padding: 20px;">
+                <h5 style="margin: 0 0 15px 0; color: #fbbf24; font-size: 0.9rem; font-weight: 700; text-transform: uppercase;">💡 Solutions / Replies</h5>
+                {% for reply in doubt.replies.all %}
+                    <div class="reply-container">
+                        <p style="margin: 0 0 5px 0; font-size: 0.95rem; color: #f1f5f9;">{{ reply.message }}</p>
+                        <small style="color: #64748b; font-weight: 600;">— {{ reply.replied_by_role|upper }} | {{ reply.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                {% empty %}
+                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; margin: 0;">No solutions provided yet. Your teacher will respond soon.</p>
+                {% endfor %}
+            </div>
+
+            {% if not doubt.is_resolved %}
+            <div style="text-align: right; margin-top: 20px;">
+                <a href="/doubts?resolve_doubt=true&did={{ doubt.id }}" 
+                   onclick="return confirm('Is your doubt cleared? This will close the thread.')"
+                   style="color: #10b981; text-decoration: none; font-size: 0.8rem; font-weight: bold; border: 1px solid #10b981; padding: 8px 18px; border-radius: 6px;">
+                   MARK AS RESOLVED
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 60px; background: rgba(15, 23, 42, 0.5); border-radius: 12px; border: 1px dashed #334155;">
+            <p style="color: #64748b; font-size: 1rem;">You haven't posted any technical doubts yet.</p>
+        </div>
+        {% endfor %}
+    </section>
+</div>
+
+</body>
+</html>

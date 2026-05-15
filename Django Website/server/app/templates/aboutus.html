@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+                <li><a href="/batch-manager">Batch Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>About Our Company</h1>
+        
+        <div class="info-block" style="margin-bottom: 25px;">
+            <h3 style="color: var(--accent);">Origin</h3>
+            <p>{{ data.origin }}</p>
+        </div>
+        
+        <div class="info-block" style="margin-bottom: 25px;">
+            <h3 style="color: var(--accent);">Mission</h3>
+            <p>{{ data.mission }}</p>
+        </div>
+        
+        <div class="info-block" style="margin-bottom: 25px;">
+            <h3 style="color: var(--accent);">Vision</h3>
+            <p>{{ data.vision }}</p>
+        </div>
+
+        {% if can_edit %}
+        <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <h2 style="color: var(--accent);">Update About Information</h2>
+            <form action="/aboutus" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="update" value="true">
+                
+                <label style="color: #e2e8f0; font-size: 0.9rem;">Origin</label>
+                <textarea name="origin" rows="3">{{ data.origin }}</textarea>
+                
+                <label style="color: #e2e8f0; font-size: 0.9rem; margin-top: 10px; display: block;">Mission</label>
+                <textarea name="mission" rows="3">{{ data.mission }}</textarea>
+                
+                <label style="color: #e2e8f0; font-size: 0.9rem; margin-top: 10px; display: block;">Vision</label>
+                <textarea name="vision" rows="3">{{ data.vision }}</textarea>
+                
+                <button type="submit" style="margin-top: 20px; width: 100%;">Save Changes</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

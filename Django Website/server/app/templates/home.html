@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.5">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+                <li><a href="/batch-manager">Batch Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container" style="text-align: center;">
+        {% if request.session.name %}
+            <h1>Welcome, {{ request.session.name }}</h1>
+            <p>You are currently logged in as a <strong>{{ request.session.role|upper }}</strong>.</p>
+        {% else %}
+            <h1>Welcome to the Website</h1>
+            <p>Please log in or register to access the platform's features.</p>
+        {% endif %}
+
+        
+            
+        <div class="container" style="max-width: 1300px; margin: 30px auto; padding: 0 30px; font-family: 'Segoe UI', sans-serif;">
+            {% if request.session.role != 'student' and request.session.role != 'superadmin' and request.session.role != 'teacher' %}
+    <section class="doubt-card-container" style="text-align: center; margin-bottom: 50px; padding: 60px 20px;">
+        <h1 style="color: #f8fafc; margin-bottom: 10px; font-weight: 700; font-size: 1.5rem;">🚀 Ready to Begin?</h1>
+        <h2 style="font-size: 3.5rem; color: #f8fafc; margin-bottom: 30px; text-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            The Future of Tech Education
+        </h2>
+        
+        <div style="margin-top: 20px;">
+            <a href="/login" class="doubt-btn" style="text-decoration: none; display: inline-block; width: auto; padding: 15px 70px; font-size: 2rem;">
+                Get Started
+            </a>
+        </div>
+    </section>
+    {% endif %}
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+        {% if request.session.role == 'student' %}
+        <div class="doubt-card-container" style="text-align: center; border: 1px solid rgba(56, 189, 248, 0.4); background: rgba(11, 43, 130, 0.3);">
+            <div style="font-size: 3rem; margin-bottom: 15px;">👨‍💻</div>
+            <h3 style="color: #38bdf8; margin-bottom: 10px;">I am a Student</h3>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 25px;">
+                Access your enrolled courses, download resources, track attendance, & ask technical doubts directly to your mentors.
+            </p>
+            <a href="/courses" class="doubt-submit-btn" style="text-decoration: none; display: inline-block; width: 80%; background: linear-gradient(90deg, #1075b9, #058596) !important;">
+                Student Dashboard
+            </a>
+        </div>
+        {% endif %}
+        {% if request.session.role == 'teacher' %}
+        <div class="doubt-card-container" style="text-align: center; border: 1px solid rgba(16, 185, 129, 0.4); background: rgba(5, 150, 105, 0.1);">
+            <div style="font-size: 3rem; margin-bottom: 15px;">👨‍🏫</div>
+            <h3 style="color: #10b981; margin-bottom: 10px;">I am a Teacher</h3>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 25px;">
+                Manage your active batches, upload PDF notes, mark daily attendance, and solve unresolved student doubts.
+            </p>
+            <a href="/teacher-portal" class="doubt-submit-btn" style="text-decoration: none; display: inline-block; width: 80%; background: linear-gradient(90deg, #10b981, #059669) !important;">
+                Teacher Workspace
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+        <div class="container" style="max-width: 1000px; margin: 60px auto; padding: 0 20px; font-family: 'Segoe UI', sans-serif;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
+
+        
+        
+        <div class="doubt-card-container" style="text-align: center; transition: transform 0.3s ease;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">🏢</div>
+            <h3 style="color: #38bdf8; margin-bottom: 15px;">About Tech System</h3>
+            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+                We are a premier technical education platform dedicated to mentoring students through expert-led batches and real-world coding challenges.
+            </p>
+            <a href="/aboutus" style="color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 0.85rem;">LEARN MORE →</a>
+        </div>
+
+        <div class="doubt-card-container" style="text-align: center; transition: transform 0.3s ease;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">📧</div>
+            <h3 style="color: #38bdf8; margin-bottom: 15px;">Contact Us</h3>
+            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+                Have questions regarding enrollments or batches? Our team is here to help you navigate your learning path.
+            </p>
+            <a href="/contactus" style="color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 0.85rem;">GET IN TOUCH →</a>
+        </div>
+
+        <div class="doubt-card-container" style="text-align: center; transition: transform 0.3s ease;">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">🛠️</div>
+            <h3 style="color: #38bdf8; margin-bottom: 15px;">Technical Support</h3>
+            <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+                Facing issues with the portal? Access our documentation or reach out to our technical team for assistance.
+            </p>
+            <a href="/contactus" style="color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 0.85rem;">GET SUPPORT →</a>
+        </div>
+
+    </div>
+</div>
+    </div>
+</body>
+</html>

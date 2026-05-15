@@ -1,0 +1,44 @@
+<div class="container" style="max-width: 1100px; margin: auto; padding: 20px;">
+    <h2>Student Attendance Directory</h2>
+    <p style="color: #94a3b8;">List of all students currently attending approved courses.</p>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; background: #1e293b; border-radius: 8px; overflow: hidden;">
+        <thead>
+            <tr style="background: #334155; color: white; text-align: left;">
+                <th style="padding: 15px;">Student Name</th>
+                <th style="padding: 15px;">Course Attending</th>
+                <th style="padding: 15px;">Batch</th>
+                <th style="padding: 15px;">Progress Status</th>
+                <th style="padding: 15px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enroll in active_students %}
+            <tr style="border-bottom: 1px solid #334155; color: #e2e8f0;">
+                <td style="padding: 15px;">
+                    <strong>{{ enroll.student.name }}</strong><br>
+                    <span style="font-size: 0.8rem; color: #94a3b8;">ID: {{ enroll.student.id }}</span>
+                </td>
+                <td style="padding: 15px;">{{ enroll.course.title }}</td>
+                <td style="padding: 15px;">
+                    <span style="background: #3b82f6; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">
+                        {{ enroll.batch.batch_number }}
+                    </span>
+                </td>
+                <td style="padding: 15px;">
+                    <span style="color: {% if enroll.status == 'Ongoing' %}#34d399{% else %}#fbbf24{% endif %};">
+                        {{ enroll.status }}
+                    </span>
+                </td>
+                <td style="padding: 15px;">
+                    <a href="/student-details/{{ enroll.student.id }}" style="color: #60a5fa; text-decoration: none; font-size: 0.9rem;">View Profile</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 30px; text-align: center; color: #94a3b8;">No active students found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

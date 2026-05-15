@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Manager - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+    <style>
+        /* Preserving existing table and input formats while updating colors to match theme */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        code { background: rgba(0, 0, 0, 0.3); padding: 2px 6px; border-radius: 4px; color: var(--fluro-blue); }
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+                <li><a href="/batch-manager">Batch Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container" style="max-width: 900px; margin: 40px auto; padding: 20px;">
+        <h1>Course Curriculum Management</h1>
+
+        <div style="background: rgba(10, 28, 78, 0.4); padding: 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 40px;">
+            <h3 style="color: var(--accent);">Add New Course Offering</h3>
+            <form action="/course-manager" method="GET" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <input type="hidden" name="add_course" value="true">
+                
+                <div>
+                    <label style="color: #cbd5e1; font-size: 0.85rem;">Course Name</label>
+                    <input type="text" name="title" placeholder="e.g. Python Full Stack" required style="width:100%;">
+                </div>
+                
+                <div>
+                    <label style="color: #cbd5e1; font-size: 0.85rem;">Subject Code</label>
+                    <input type="text" name="subject_code" placeholder="e.g. CS-601" required style="width:100%;">
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <label style="color: #cbd5e1; font-size: 0.85rem;">Description</label>
+                    <textarea name="desc" placeholder="Course details and learning outcomes..." required style="width:100%; height: 80px; background: rgba(15, 23, 42, 0.5); color:white; border:1px solid var(--border); padding:10px; border-radius:4px;"></textarea>
+                </div>
+
+                <div>
+                    <label style="color: #cbd5e1; font-size: 0.85rem;">Base Fee (₹)</label>
+                    <input type="number" name="fee" placeholder="5000" style="width:100%;">
+                    <div style="margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; color: #cbd5e1; cursor: pointer; font-size: 0.85rem;">
+                            <input type="checkbox" name="is_free" value="true" style="width: 16px; height: 16px;">
+                            <span>Mark as Free (Auto-Approval)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-end;">
+                    <button type="submit" style="width:100%; padding:12px; cursor: pointer;">Publish Course</button>
+                </div>
+            </form>
+        </div>
+
+        <h2 style="color: white; border-bottom: 2px solid var(--accent); padding-bottom: 10px;">Existing Courses</h2>
+        <table>
+            <thead>
+                <tr style="color: var(--accent);">
+                    <th>Code</th>
+                    <th>Course Name</th>
+                    <th>Base Fee</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in courses %}
+                <tr style="color: white;">
+                    <td><code>{{ c.subject_code }}</code></td>
+                    <td><strong>{{ c.title }}</strong></td>
+                    <td>₹{{ c.fee }}</td>
+                    <td>
+                        <a href="/course-manager?delete_course=true&cid={{ c.id }}" 
+                           onclick="return confirm('Delete this course? This will remove it from the enrollment options.')" 
+                           style="color: #ef4444; font-weight: bold; text-decoration:none;">Remove</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">
+                        No courses added yet. Use the form above to add your first course.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

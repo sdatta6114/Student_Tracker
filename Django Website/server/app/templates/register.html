@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Registration - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/login">Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="max-width: 500px; margin: 40px auto;">
+        <h1 style="color: var(--text);">Register as {{ reg_type|title }}</h1>
+        
+        <div style="margin-bottom: 25px;">
+            <p style="color: #cbd5e1; font-size: 0.95rem;">Join our faculty. Please note that all teacher accounts require Admin approval before login.</p>
+        </div>
+
+        <form action="/register" method="GET">
+            <input type="hidden" name="submit" value="true">
+            <input type="hidden" name="role" value="teacher">
+            
+            <label style="color: var(--accent); font-size: 0.85rem;">Full Name</label>
+            <input type="text" name="name" placeholder="Full Name" required>
+            
+            <label style="color: var(--accent); font-size: 0.85rem; margin-top: 10px; display: block;">Email Address</label>
+            <input type="email" name="email" placeholder="Email Address" required>
+            
+            <label style="color: var(--accent); font-size: 0.85rem; margin-top: 10px; display: block;">Password</label>
+            <input type="password" name="password" placeholder="Password" required>
+
+            <button type="submit" style="margin-top: 30px; width: 100%;">Complete Registration</button>
+        </form>
+        
+        <p style="margin-top: 20px; font-size: 0.85rem; color: #cbd5e1; text-align: center; border-top: 1px solid var(--border); padding-top: 15px;">
+            Registration is currently only open for Teachers.
+        </p>
+    </div>
+</body>
+</html>

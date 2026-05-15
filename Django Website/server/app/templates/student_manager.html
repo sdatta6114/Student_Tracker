@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Manager - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+    <style>
+        /* Preserving existing table and input formats while updating colors to match theme */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        code { background: rgba(0, 0, 0, 0.3); padding: 2px 6px; border-radius: 4px; color: var(--fluro-blue); }
+        input[type="text"], input[type="email"] {
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            color: white;
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.5">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+                <li><a href="/batch-manager">Batch Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+        <h1>Student Account Management</h1>
+
+        <div style="background: rgba(11, 43, 130, 0.4); padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--border);">
+            <h3 style="color: var(--accent);">Create New Student</h3>
+            <form action="/student-manager" method="GET" style="display: flex; gap: 10px; align-items: flex-end;">
+                <input type="hidden" name="create_student" value="true">
+                <input type="text" name="s_name" placeholder="Name" required style="flex:1;">
+                <input type="email" name="s_email" placeholder="Email" required style="flex:1;">
+                <input type="text" name="s_pass" placeholder="Password" required style="flex:1;">
+                <button type="submit" style="padding: 10px 20px;">Add Student</button>
+            </form>
+        </div>
+
+        <h2 style="color: white; border-bottom: 2px solid var(--accent); padding-bottom: 10px;">Active Student Credentials</h2>
+        <table>
+            <thead>
+                <tr style="color: var(--accent);">
+                    <th>Name</th>
+                    <th>Email (Login)</th>
+                    <th>Password</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr style="color: white;">
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.email }}</td>
+                    <td><code>{{ s.pwd }}</code></td>
+                    <td>
+                        <a href="/student-manager?delete_student=true&sid={{ s.id }}" 
+                           onclick="return confirm('Delete this student?')" 
+                           style="color: #ef4444; font-weight: bold; text-decoration: none;">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

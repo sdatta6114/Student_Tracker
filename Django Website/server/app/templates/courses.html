@@ -1,0 +1,286 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+   <div class="container" style="max-width: 1500px; margin: 40px auto; padding: 20px;">
+    <h1>Your Learning Dashboard</h1>
+    <p>Welcome, {{ request.session.name }}. Track your schedule, resources, and progress here.</p>
+    
+        <h2 style="margin-top: 0px; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">🗓️ My Class Schedule</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 20px; margin-top: 20px;">
+            {% for enroll in enrollments %}
+            
+<div style="background: rgba(11, 43, 130, 0.4); border: 1px solid var(--border); padding: 25px; border-radius: 12px; position: relative; backdrop-filter: blur(15px); display: flex; flex-direction: column; min-height: 750px; justify-content: space-between; box-sizing: border-box;">
+    
+    <div style="flex-grow: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h3 style="margin: 0; color: #f8fafc;">{{ enroll.course.title }}</h3>
+                {% if enroll.is_approved %}
+                    <p style="color: #cbd5e1; font-size: 0.85rem; margin: 5px 0;">Batch ID: {{ enroll.batch.batch_number }}</p>
+                {% endif %}
+            </div>
+            <span style="background: #065f46; color: #34d399; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: bold;">
+                {{ enroll.status }}
+            </span>
+        </div>
+
+        {% if enroll.is_approved %}
+            {% if enroll.batch.is_completed %}
+                {% if enroll.status == "Completed" %}
+                    <div style="background: #064e3b; border: 1px solid #059669; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                        <p style="margin: 0; color: #34d399; font-weight: bold;">✅ Course Completed Successfully</p>
+                        <a href="/download-certificate/{{ enroll.id }}" style="display: inline-block; margin-top: 10px; color: white; font-weight: bold; text-decoration: underline; font-size: 0.9rem;">
+                            🎓 Download Official Certificate
+                        </a>
+                    </div>
+                    <div style="background: #3b82f6; border: 1px solid #3b82f6; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                    <a href="/download-report/{{ enroll.id }}" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+                📊 Performance Report
+            </a>
+            </div>
+                    
+                    <div style="margin-top: 15px; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #10b981;">
+                        <h4 style="font-size: 0.9rem; color: #34d399; margin-top: 0;">⭐ Rate Your Experience</h4>
+                        {% if not enroll.course_rating %}
+                            <form action="/submit-review" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="enrollment_id" value="{{ enroll.id }}">
+                                <select name="rating" required style="background: #1e293b; color: white; border: 1px solid #334155; padding: 8px; border-radius: 4px;">
+                                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                                    <option value="4">⭐⭐⭐⭐ Very Good</option>
+                                    <option value="3">⭐⭐⭐ Good</option>
+                                </select>
+                                <textarea name="feedback" placeholder="Write a review..." required style="background: #1e293b; color: white; border: 1px solid #334155; padding: 8px; border-radius: 4px; height: 60px;"></textarea>
+                                <button type="submit" style="background: #10b981; color: white; border: none; padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer;">Submit Review</button>
+                            </form>
+                        {% else %}
+                            <p style="color: #34d399; font-weight: bold; font-size: 0.85rem;">Rating: {{ enroll.course_rating }}/5</p>
+                            <p style="color: #94a3b8; font-size: 0.8rem; font-style: italic;">"{{ enroll.course_feedback }}"</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div style="background: #450a0a; border: 1px solid #ef4444; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                        <h3 style="color: #f87171; margin-top: 0;">❌ Course Incomplete</h3>
+                        <p style="color: #fca5a5; font-size: 0.9rem; line-height: 1.4;">
+                            The batch tenure has ended, but you did not meet the completion requirements. Access is now denied.
+                        </p>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                {% if enroll.amount_paid < enroll.total_fee %}
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <p style="margin: 0; color: #fca5a5; font-size: 0.85rem; line-height: 1.4;">
+                            ⚠️ <strong>Notice:</strong> Full payment pending. Paid: <strong>₹{{ enroll.amount_paid }}</strong> / <strong>₹{{ enroll.total_fee }}</strong>
+                        </p>
+                    </div>
+                {% endif %}
+
+                {% if enroll.is_halted %}
+                    <div style="background: #450a0a; border: 1px solid #ef4444; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                        <h3 style="color: #f87171; margin-top: 0;">⚠️ ACCESS SUSPENDED</h3>
+                        <p style="color: #fca5a5; font-size: 0.9rem;">Please clear balance to resume class access.</p>
+                    </div>
+                {% else %}
+                    <div style="background: #0f172a; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                        <p style="margin: 0; color: #e2e8f0;">🗓️ Days: {{ enroll.batch.schedule_days|default:"TBA" }}</p>
+                        <p style="margin: 10px 0 0 0; color: #e2e8f0;">⏰ Time: {{ enroll.batch.schedule_time|time:"H:i"|default:"TBA" }}</p>
+                    </div>
+                    <a href="{{ enroll.batch.class_link }}" target="_blank" style="display: block; background: #3b82f6; color: white; text-align: center; padding: 12px; border-radius: 6px; text-decoration: none; font-weight: bold;">Join Live Class</a>
+
+                   <div style="border-top: 1px solid #334155; padding-top: 15px; margin-top: 15px;">
+    <h4 style="color: #fbbf24; margin-top: 0; font-size: 0.9rem;">📚 Course Resources</h4>
+    <ul style="list-style: none; padding: 0;">
+        {% for res in enroll.batch.resource_set.all %}
+        <li style="background: #0f172a; margin-bottom: 12px; padding: 12px; border-radius: 8px; border: 1px solid #1e293b;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: {% if res.video_file %}10px{% else %}0px{% endif %};">
+                <span style="font-size: 0.85rem; font-weight: bold; color: #f8fafc;">📄 {{ res.title }}</span>
+                <div>
+                    {% if res.notes %}
+                        <a href="{{ res.notes.url }}" download style="color: #10b981; font-size: 0.8rem; text-decoration: none; margin-right: 15px;">Download PDF</a>
+                    {% endif %}
+                    
+                    {% if res.video_url %}
+                        <a href="{{ res.video_url }}" target="_blank" style="color: #fbbf24; font-size: 0.8rem; text-decoration: none;">Watch Link</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if res.video_file %}
+            <div style="margin-top: 10px; background: #020617; padding: 5px; border-radius: 6px;">
+                <video width="100%" controls style="border-radius: 5px; max-height: 300px; outline: none;">
+                    <source src="{{ res.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            {% endif %}
+        </li>
+        {% empty %}
+        <li style="color: #64748b; font-size: 0.8rem; font-style: italic;">No resources uploaded yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+                    <div style="background: #0f172a; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #1e293b;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="color: #3b82f6; margin: 0; font-size: 0.85rem;">📊 Attendance Status</h4>
+                            <div style="text-align: right;">
+                                <span style="color: #10b981; font-weight: bold; font-size: 0.9rem; display: block;">{{ enroll.present_days }} Days Present</span>
+                                <a href="/download-attendance/{{ enroll.id }}" style="color: #60a5fa; font-size: 0.7rem; text-decoration: underline;">Download Log</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div style="background: #0f172a; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #1e293b;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h4 style="color: #3b82f6; margin: 0; font-size: 0.85rem;">📊 Attendance Status</h4>
+        <div style="text-align: right;">
+            <span style="color: #10b981; font-weight: bold; font-size: 0.9rem; display: block;">{{ enroll.present_days }} Days Present</span>
+            <a href="/download-attendance/{{ enroll.id }}" style="color: #60a5fa; font-size: 0.7rem; text-decoration: underline;">Download Log</a>
+        </div>
+    </div>
+</div> -->
+
+<div style="background: #0f172a; padding: 15px; border-radius: 8px; margin: 15px 0; border-top: 3px solid #fbbf24; border-bottom: 1px solid #1e293b;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h4 style="color: #fbbf24; margin: 0; font-size: 0.85rem;">❓ Recent Doubts</h4>
+        <a href="/doubts" style="color: #38bdf8; font-size: 0.7rem; text-decoration: none; font-weight: bold;">Ask a New Doubt →</a>
+    </div>
+    
+    <ul style="list-style: none; padding: 0; margin: 0;">
+        {% for doubt in enroll.studentdoubt_set.all|slice:":2" %}
+        <li style="background: rgba(15, 23, 42, 0.5); margin-bottom: 8px; padding: 8px; border-radius: 5px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75rem; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">
+                {{ doubt.title }}
+            </span>
+            <span style="font-size: 0.65rem; font-weight: bold; color: {% if doubt.is_resolved %}#10b981{% else %}#f59e0b{% endif %};">
+                {% if doubt.is_resolved %}RESOLVED{% else %}PENDING{% endif %}
+            </span>
+        </li>
+        {% empty %}
+        <li style="color: #64748b; font-size: 0.75rem; font-style: italic;">No doubts posted for this course yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+                    <div style="margin-top: 15px; background: #1e293b; padding: 15px; border-radius: 8px; border: 1px dashed #3b82f6;">
+                        <h4 style="font-size: 0.9rem; color: #60a5fa; margin-top: 0;">📤 Submit Assignment</h4>
+                        <form action="/courses" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="enrollment_id" value="{{ enroll.id }}">
+                            <input type="file" name="assignment_file" required style="font-size: 0.8rem; color: #94a3b8;">
+                            <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">Upload Submission</button>
+                        </form>
+                    </div>
+
+                    <div style="margin-top: 15px; border-top: 1px solid #334155; padding-top: 10px;">
+                        <h4 style="color: #fbbf24; font-size: 0.9rem;">My Submissions</h4>
+                        {% for sub in enroll.assignmentsubmission_set.all %}
+                        <div style="background: #0f172a; padding: 10px; border-radius: 5px; margin-bottom: 8px; border: 1px solid #1e293b;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: #e2e8f0;">📄 {{ sub.file.name|truncatechars:20 }}</span>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a href="{{ sub.file.url }}" target="_blank" style="color: #3b82f6; font-size: 0.75rem; text-decoration: none; font-weight: bold;">View</a>
+                
+                {% if not sub.remarks and not sub.rating %}
+                    <a href="/upload-assignment?delete_id={{ sub.id }}" 
+                       onclick="return confirm('Are you sure you want to delete this submission?')" 
+                       style="color: #ef4444; font-size: 0.75rem; text-decoration: none; font-weight: bold;">
+                       Delete
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if sub.remarks or sub.rating %}
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #334155;">
+                {% if sub.rating %}<p style="color: #34d399; font-size: 0.9rem; font-weight: bold; margin: 0;">⭐ Grade: {{ sub.rating }}/10</p>{% endif %}
+                {% if sub.remarks %}<p style="color: #a7f3d0; font-size: 0.75rem; font-style: italic; margin: 4px 0 0 0;">"{{ sub.remarks }}"</p>{% endif %}
+            </div>
+        {% else %}
+            <p style="color: #fbbf24; font-size: 0.7rem; margin-top: 8px; font-style: italic;">⏳ Status: Pending Review</p>
+        {% endif %}
+    </div>
+    {% empty %}
+        <p style="color: #64748b; font-size: 0.8rem; font-style: italic;">No assignments submitted yet.</p>
+    {% endfor %}
+</div>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <div style="text-align: center; padding: 20px; background: rgba(69, 26, 3, 0.4); border: 1px solid #92400e; border-radius: 10px;">
+                <p style="color: #fbbf24; font-weight: bold;">⏳ Pending Approval</p>
+                <p style="color: #fcd34d; font-size: 0.85rem;">Admin is currently assigning your batch.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="border-top: 1px solid #334155; padding-top: 15px; margin-top: 15px;">
+        <h4 style="color: #10b981; margin-top: 0; font-size: 0.9rem;">💳 My Official Receipts</h4>
+        {% for rec in enroll.officialreceipt_set.all %}
+            <div style="background: #065f46; border: 1px solid #10b981; padding: 12px; border-radius: 8px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1;">
+                    <p style="margin: 0; font-weight: bold; color: #34d399;">Receipt: {{ rec.receipt_number }}</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: white;">₹{{ rec.amount_verified }} verified</p>
+                </div>
+                <a href="/download-receipt/{{ rec.id }}" style="background: white; color: #065f46; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.75rem;">Download PDF</a>
+            </div>
+        {% empty %}
+            <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">🕒 Official receipt pending verification.</p>
+        {% endfor %}
+    </div>
+</div>
+{% empty %}
+<div style="grid-column: span 2; text-align: center; padding: 60px; background: #1e293b; border-radius: 12px;">
+    <p style="color: #94a3b8; font-size: 1.1rem;">Enroll in a course below to get started!</p>
+</div>
+{% endfor %}
+        </div>
+    </div>
+</body>
+</html>

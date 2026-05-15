@@ -1,0 +1,320 @@
+/* --- Global Variables & Theme Settings --- */
+/* --- Global Variables & Theme Settings --- */
+:root {
+    /* Multi-stop gradient colors */
+    --med-blue: #3b82f6;
+    --fluro-blue: #00ffff; /* Fluorescent Blue highlight */
+    --white: #ffffff;
+    
+    /* REPLACING BLACK WITH DEEP BLUE */
+    --card-bg:  rgba(15, 29, 63, 0.9)!important; 
+    --nav-bg: rgba(15, 29, 65, 0.9) !important;  
+    
+    --text: #ffffff;
+    --accent: #00ffff; /* Fluorescent accent */
+    --border: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Body & Layout --- */
+body {
+    /* 5-stop gradient: Med Blue -> Fluro -> White -> Fluro -> Med Blue */
+    background: linear-gradient(135deg, 
+        var(--med-blue) 0%, 
+        var(--fluro-blue) 25%, 
+        var(--white) 50%, 
+        var(--fluro-blue) 75%, 
+        var(--med-blue) 100%) !important;
+    background-attachment: fixed !important;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+
+/* --- Navigation Bar --- */
+.navbar {
+    background: var(--nav-bg);
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.5rem;
+    color: var(--text);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    margin: 0;
+}
+
+.nav-links a, .btn, button {
+    position: relative;
+    padding: 12px 25px;
+    color: #1e293b !important; /* Dark text for better visibility on bright fluro gradient */
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: 8px;
+    /* Applying the same multi-stop gradient to buttons */
+    background: linear-gradient(90deg, 
+        var(--med-blue), 
+        var(--fluro-blue), 
+        var(--white), 
+        var(--fluro-blue), 
+        var(--med-blue)) !important;
+    background-size: 300% auto; /* Allows for smooth movement on hover */
+    overflow: hidden;
+    transition: all 0.4s ease;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+/* Hover & Shine Animation logic */
+.nav-links a:hover, .btn:hover, button:hover {
+    transform: translateY(-2px); /* Lift effect */
+    filter: brightness(1.1);
+    box-shadow: 0 8px 15px rgba(59, 130, 246, 0.4);
+}
+
+/* The Shine Overlay Streak */
+.nav-links a::after, .btn::after, button::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -110%;
+    width: 100%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.3); /* Transparent white shine */
+    transform: rotate(30deg);
+    transition: all 0.6s ease;
+}
+
+.nav-links a:hover::after, .btn:hover::after, button:hover::after {
+    left: 110%; /* Makes the light streak across the button */
+}
+
+/* --- Dropdown System --- */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #1e3a8a; /* Solid Deep Blue for menus */
+    min-width: 200px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
+    z-index: 1;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    top: 100%;
+    padding: 5px 0;
+}
+
+.dropdown-content a {
+    background: transparent !important; /* Flat links inside the menu */
+    border-radius: 0;
+    width: 100%;
+    padding: 12px 16px;
+    box-shadow: none !important;
+}
+
+.dropdown-content a::after {
+    display: none; /* No shine animation inside the dropdown list */
+}
+
+.dropdown-content a:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--accent) !important;
+    transform: none;
+}
+
+/* --- Glassmorphism Containers --- */
+/* --- Glassmorphism Containers --- */
+.container, .card, .portal-tab, .tab-content {
+    max-width: 900px;
+    /* Added margin-top: 40px to create space below the navbar */
+    margin: 40px auto; 
+    background: var(--card-bg) !important; 
+    padding: 40px;
+    border-radius: 16px;
+    backdrop-filter: blur(15px) saturate(150%) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    color: white !important;
+}
+
+/* --- Form Elements --- */
+input, textarea, select {
+    padding: 12px;
+    background: rgba(15, 23, 42, 0.5); /* Semi-transparent dark input */
+    border: 1px solid var(--border);
+    color: white;
+    border-radius: 6px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+h1, h2, h3 {
+    color: white;
+    margin-top: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Glassmorphism Container for Doubts */
+.doubt-container {
+    background: rgba(11, 43, 130, 0.2);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.doubt-header {
+    color: #38bdf8; /* Cyan blue from your workspace buttons */
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+/* Input Styling to match your Teacher Workspace */
+.doubt-input-group {
+    margin-bottom: 20px;
+}
+
+.doubt-label {
+    display: block;
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.doubt-field {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 12px;
+    color: white;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.doubt-field:focus {
+    outline: none;
+    border-color: #38bdf8;
+    background: rgba(15, 23, 42, 0.8);
+}
+
+/* Styled File Upload */
+.doubt-file-input {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    padding: 10px 0;
+}
+
+/* Gradient Button */
+.doubt-btn {
+    background: linear-gradient(90deg, #06b6d4, #3b82f6);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.doubt-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+}
+
+--- Glassmorphism Core Variables --- */
+/* :root {
+    --glass-bg: rgba(15, 29, 63, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --student-cyan: #38bdf8;
+    --teacher-green: #10b981;
+    --text-muted: #94a3b8;
+}
+
+/* --- Container Adjustments --- */
+.container {
+    color: white;
+    /* This ensures children inherit the frosted look if nested */
+}
+
+/* --- Glass Card Styling --- */
+.doubt-card-container {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(15px) saturate(160%);
+    -webkit-backdrop-filter: blur(15px) saturate(160%);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--glass-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* --- Hover Effects for Info Boxes --- */
+.doubt-card-container:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+/* --- Gradient Buttons --- */
+.doubt-submit-btn {
+    background: linear-gradient(90deg, #06b6d4, #3b82f6) !important;
+    color: white !important;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+}
+
+.doubt-submit-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+    filter: brightness(1.1);
+}
+
+/* --- Typography --- */
+h1, h2, h3 {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+p {
+    color: var(--text-muted);
+}
+
+/* --- Responsive Grid Fixes --- */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px !important;
+    }
+    h1 {
+        font-size: 2rem !important;
+    }
+}

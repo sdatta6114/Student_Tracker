@@ -1,0 +1,34 @@
+{% load static %}
+<html>
+<head>
+    <title>Certificate Verification - TECH SYSTEM</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body style="background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <div style="background: #1e293b; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #334155; max-width: 500px; width: 90%;">
+        <h1 style="color: #3b82f6; margin-bottom: 10px;">TECH SYSTEM</h1>
+        <hr style="border: 0.5px solid #334155; margin-bottom: 30px;">
+
+        {% if is_valid %}
+            <div style="background: #065f46; color: #34d399; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold;">
+                ✅ AUTHENTIC CERTIFICATE
+            </div>
+            <p style="font-size: 1.2rem;">This certificate was officially issued to:</p>
+            <h2 style="color: #f8fafc; text-transform: uppercase;">{{ enroll.student.name }}</h2>
+            <p>for successful completion of</p>
+            <h3 style="color: #fbbf24;">{{ enroll.course.title }}</h3>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 20px;">
+                Verification ID: TS-{{ enroll.id }}-{{ enroll.student.id }}<br>
+                Issued Date: {{ enroll.updated_at|date:"M d, Y" }}
+            </p>
+        {% else %}
+            <div style="background: #450a0a; color: #f87171; padding: 15px; border-radius: 8px; font-weight: bold;">
+                ❌ INVALID CERTIFICATE
+            </div>
+            <p style="margin-top: 20px;">The record for this certificate could not be verified in our system.</p>
+        {% endif %}
+
+        <a href="/home" style="display: inline-block; margin-top: 30px; color: #3b82f6; text-decoration: none;">← Visit Tech System</a>
+    </div>
+</body>
+</html>

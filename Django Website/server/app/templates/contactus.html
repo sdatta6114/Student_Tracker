@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.9">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+                <li><a href="/batch-manager">Batch Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher'  %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Contact Us</h1>
+        <div class="info-block" style="padding: 10px 0;">
+            <p>📍 <strong style="color: var(--accent);">Address:</strong> {{ data.address }}</p>
+            <p>📞 <strong style="color: var(--accent);">Phone:</strong> {{ data.phone }}</p>
+            <p>✉️ <strong style="color: var(--accent);">Email:</strong> {{ data.email }}</p>
+        </div>
+
+        {% if can_edit %}
+        <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <h2 style="color: var(--accent);">Update Contact Details</h2>
+            <form action="/contactus" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="update" value="true">
+                
+                <label style="color: #e2e8f0; font-size: 0.9rem;">Address</label>
+                <input type="text" name="address" value="{{ data.address }}">
+                
+                <label style="color: #e2e8f0; font-size: 0.9rem; margin-top: 10px; display: block;">Phone</label>
+                <input type="text" name="phone" value="{{ data.phone }}">
+                
+                <label style="color: #e2e8f0; font-size: 0.9rem; margin-top: 10px; display: block;">Email</label>
+                <input type="email" name="email" value="{{ data.email }}">
+                
+                <button type="submit" style="margin-top: 25px; width: 100%;">Update Details</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

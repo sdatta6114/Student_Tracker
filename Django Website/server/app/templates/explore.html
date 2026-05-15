@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tech System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.5">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><strong>TECH SYSTEM</strong></div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/aboutus">About</a></li>
+            <li><a href="/contactus">Contact</a></li>
+            
+            {% if request.session.role == 'admin' or request.session.role == 'superadmin' %}
+                <li><a href="/admin-dash">Dashboard</a></li>
+                <li><a href="/student-manager">Student Manager</a></li>
+                <li><a href="/course-manager">Course Manager</a></li>
+            {% endif %}
+
+            {% if request.session.role == 'student' %}
+                <li><a href="/courses">My Courses</a></li>
+                <li class="dropdown">
+                    <a href="/explore" class="dropbtn">Explore More Courses ▾</a>
+                    <div class="dropdown-content">
+                        <a href="/explore#free-section">Free Courses</a>
+                        <a href="/explore#premium-section">Premium Courses</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            {% if request.session.role == 'teacher' %}
+                <li><a href="/teacher-portal">My Batches</a></li>
+            {% endif %}
+
+            {% if request.session.role %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+        <h2 style="color: #ffffff;">🆓 Free Learning Resources</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            {% for course in courses %}
+                {% if course.is_free %}
+                <div style="background: #064e3b; padding: 20px; border-radius: 12px; border: 1px solid #059669;">
+                    <h3 style="color: white; margin-top: 0;">{{ course.title }}</h3>
+                    <p style="color: #a7f3d0; font-size: 0.85rem;">{{ course.description|truncatewords:10 }}</p>
+                    <form action="/explore" method="GET">
+                        <input type="hidden" name="apply" value="true">
+                        <input type="hidden" name="course_id" value="{{ course.id }}">
+                        <button type="submit" style="width: 100%; padding: 10px; background: white; color: #064e3b; border-radius: 6px; font-weight: bold; cursor: pointer; border: none;">Get Instant Access</button>
+                    </form>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <h2 style="margin-top: 40px;">💎 Premium Courses</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            {% for course in courses %}
+                {% if not course.is_free %}
+                <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
+                    <h3 style="margin-top: 0;">{{ course.title }}</h3>
+                    <p><strong>Fee:</strong> ₹{{ course.fee }}</p>
+                    <form action="/explore" method="GET">
+                        <input type="hidden" name="apply" value="true">
+                        <input type="hidden" name="course_id" value="{{ course.id }}">
+                        <button type="submit" style="width: 100%; margin-top: 10px; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Apply for Course</button>
+                    </form>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
